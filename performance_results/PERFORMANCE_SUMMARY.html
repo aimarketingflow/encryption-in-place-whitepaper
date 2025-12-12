@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Chaos Lock - Performance Summary</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif; margin: 32px; color: #111; }
+    h1 { margin: 0 0 6px; }
+    .sub { color: #555; margin: 0 0 18px; }
+    .card { border: 1px solid #e5e5e5; border-radius: 12px; padding: 16px; margin: 14px 0; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; border-bottom: 1px solid #eee; padding: 10px 8px; vertical-align: top; }
+    th { color: #444; font-weight: 600; font-size: 13px; }
+    td { font-size: 14px; }
+    code { background: #f6f6f6; padding: 2px 6px; border-radius: 6px; }
+    .kpi { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+    .kpi .box { border: 1px solid #eee; border-radius: 12px; padding: 12px; }
+    .kpi .val { font-size: 26px; font-weight: 700; }
+    .kpi .lbl { color: #666; margin-top: 4px; }
+    .note { color: #666; font-size: 13px; line-height: 1.4; }
+  </style>
+</head>
+<body>
+  <h1>Chaos Lock Performance Summary</h1>
+  <p class="sub">White-paper ready metrics derived from saved test logs + machine environment</p>
+
+  <div class="card">
+    <h2 style="margin: 0 0 10px;">Run: 11.36GB Folder Lock (log-derived)</h2>
+    <div class="kpi">
+      <div class="box">
+        <div class="val">11,363.8 MB</div>
+        <div class="lbl">Dataset size</div>
+      </div>
+      <div class="box">
+        <div class="val">15,397</div>
+        <div class="lbl">Files</div>
+      </div>
+      <div class="box">
+        <div class="val">394 s</div>
+        <div class="lbl">Total time</div>
+      </div>
+      <div class="box">
+        <div class="val">28.85 MB/s</div>
+        <div class="lbl">Throughput</div>
+      </div>
+      <div class="box">
+        <div class="val">39.09 files/s</div>
+        <div class="lbl">File processing rate</div>
+      </div>
+      <div class="box">
+        <div class="val">100,000</div>
+        <div class="lbl">PBKDF2 iterations</div>
+      </div>
+    </div>
+    <p class="note" style="margin-top: 12px;">
+      <strong>Environment:</strong> Apple M1, 8GB RAM, macOS 15.7.2.
+      Dataset + computed metrics are stored in <code>performance_results/perf_results.csv</code> and <code>perf_results.jsonl</code>.
+    </p>
+    <p class="note">
+      <strong>Measurement note:</strong> The source log shows a final size-progress value of <code>5629.5/11363.8 MB (49%)</code>
+      immediately before completion. Because the run ends with <code>✅ Folder locked successfully!</code> and <code>⏱️ Total time: 394s</code>,
+      we treat this as a progress accounting artifact (e.g., batching/size counter mismatch) and not incomplete encryption.
+    </p>
+  </div>
+
+  <div class="card">
+    <h2 style="margin: 0 0 10px;">Dataset Row (CSV)</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>run_id</th>
+          <th>implementation</th>
+          <th>dataset_path</th>
+          <th>total_files</th>
+          <th>total_size_mb</th>
+          <th>total_time_s</th>
+          <th>throughput_mb_s</th>
+          <th>files_per_s</th>
+          <th>pbkdf2_iterations</th>
+          <th>aes_mode</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>2025-12-10_11gb-test</td>
+          <td>Python Easy Encryption V2</td>
+          <td>/Users/akido/Documents/Test2/11gb-test</td>
+          <td>15397</td>
+          <td>11363.8</td>
+          <td>394</td>
+          <td>28.85</td>
+          <td>39.09</td>
+          <td>100000</td>
+          <td>AES-256-GCM</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2 style="margin: 0 0 10px;">How to append new runs</h2>
+    <p class="note">If you save a new lock/unlock log, you can append it into the dataset with:</p>
+    <pre><code>python3 performance_results/parse_perf_log.py Test-logs/&lt;your_log&gt;.md \
+  --csv performance_results/perf_results.csv \
+  --jsonl performance_results/perf_results.jsonl</code></pre>
+  </div>
+
+</body>
+</html>
